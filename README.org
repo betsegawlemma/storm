@@ -1,3 +1,44 @@
-# storm
-# storm
-# storm
+* Introduction
+This is a simple project using [[http://storm.apache.org/][Apache Storm]] which reads a 3 minute [[https://en.wikipedia.org/wiki/Automatic_identification_system][AIS data]] from file and extract some information such as vessel name, speed, direction, date,
+time, maximum speed of each vessel, and the number of vessels. The project constitutes two major parts. 
+ 1. The first part is to parse the raw AIS data using [[https://github.com/bcl/aisparser][AISParser]]. We have used the C version of the parser as shown in [[file:main.c][main.c]] and the resulting
+    output file is [[file:aisfile][aisfile]]. This aisfile has the following format
+| UserID | Speed Over Ground(SOG) | Course Over Ground (COG) | Vessel Name | Year | Month | Day | Hour | Minute | Second | Longitude | Latitude |
+|--------+------------------------+--------------------------+-------------+------+-------+-----+------+--------+--------+-----------+----------|
+   - Information about the AIS data format is available at [[http://catb.org/gpsd/AIVDM.html]]
+ 2. The second part of the project is to read the [[file:aisfile][aisfile]] one line at a time, reformat it and produced the required information.
+ Apache storm provides two primitives for stream transformations: Spouts and Bolts. You can check the short storm tutorial available at Apache Storm's
+ website [[http://storm.apache.org/releases/current/Tutorial.html][here]] in order to get the basic understanding of this primitives.  
+* Spout
+The [[file:AISSpout.java][AISSpout.java]] program is the spout program which simply reads one line from the aisfile and emit it.
+#+BEGIN_EXAMPLE
+                ....
+  public void nextTuple() {
+
+     Utils.sleep(100); 
+     try{
+          if(fileInput.hasNextLine()){
+            String[] oneLine = fileInput.nextLine().split(",");
+            final ArrayList<String> ais = new ArrayList(Arrays.asList(oneLine));
+            _collector.emit(new Values(ais));
+          }
+       }catch(Exception e){
+         throw new RuntimeException(e.getMessage());
+        }
+            ....
+#+END_EXAMPLE
+* Bolts
+All the Bolts and the main program is in the [[file:AISTopology.java][AISTopology.java]] file. It contains five bolts.
+** AISSelectNamedShipsBolt 
+  The purpose of this Bolt is to pass to the next bolt only streams whose name field is not empty. 
+** AISFormatBolt
+  This Bolt combine the Year, Month and Day fields together as a single date field and do similar formatting for the time and location fields.
+** AISMesssagesPerShipBolt
+  This Bolt counts the number of identification message that each vessel has send during the 3 minute period
+** AISMaxSpeedPerShipBolt
+  This Bolt returns the maximum speed of each vessel
+** AISShipCountBolt
+  This Bolt counts the number of unique vessels encountered during the 3 minute period.
+** Main program
+  The main program creates the topology.
+All the bolts write their output into a file for debugging purpose. 
