@@ -43,4 +43,5 @@ All the Bolts and the main program is in the [[file:AISTopology.java][AISTopolog
   This Bolt counts the number of unique vessels encountered during the 3 minute period.
 ** Main program
   The main program creates the topology.
-All the bolts write their output into a file for debugging purpose. 
+All the bolts write their output into a file for debugging purpose. The final output looks like the following.
+[[file:topology.png]] 
