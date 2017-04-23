@@ -2,7 +2,7 @@
 This is a simple project using [[http://storm.apache.org/][Apache Storm]] which reads a 3 minute [[https://en.wikipedia.org/wiki/Automatic_identification_system][AIS data]] from file and extract some information such as vessel name, speed, direction, date,
 time, maximum speed of each vessel, and the number of vessels. The project constitutes two major parts. 
  1. The first part is to parse the raw AIS data using [[https://github.com/bcl/aisparser][AISParser]]. We have used the C version of the [[file:main.c][parser]] and the resulting output file is [[file:aisfile][aisfile]].
-    This aisfile has the following format. Information about the AIS data format is available at [[http://catb.org/gpsd/AIVDM.html]] 
+    This aisfile has the format shown in table below. Information about the AIS data format is available at [[http://catb.org/gpsd/AIVDM.html]] 
   
 | UserID | Speed Over Ground(SOG) | Course Over Ground (COG) | Vessel Name | Year | Month | Day | Hour | Minute | Second | Longitude | Latitude |
 |--------+------------------------+--------------------------+-------------+------+-------+-----+------+--------+--------+-----------+----------|
